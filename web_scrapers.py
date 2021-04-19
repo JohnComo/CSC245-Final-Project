@@ -1,0 +1,89 @@
+import pandas as pd 
+import os 
+import tweepy as tw
+import yfinance as yf
+import secrets
+
+def yahoo_history_scraper(ticker, period, start, end): 
+    '''
+    Creates a pandas dataframe for specified stock from start to end by specified period
+
+    Parameters: 
+        ticker (str) : stock ticker from yahoo
+        period (str) : '1d', '1h', etc.
+        start (str) : 'YYYY-MM-DD'
+        end (str) : 'YYYY-MM-DD'
+    
+    Returns: 
+        DataFrame with features Open High Low Close Volume Dividends Stock Splits
+    '''
+    ticker_symbol = ticker 
+
+    tickerData = yf.Ticker(ticker_symbol)
+
+    tickerDf = tickerData.history(period = period, start = start, end = end)
+
+    return tickerDf
+
+
+#doge = yahoo_history_scraper('DOGE-USD', '1d', '2020-10-01', '2021-04-10')
+#print(doge.tail())
+
+def twitter_fetch(hashtag, date, max_tweets): 
+    '''
+    Creates a txt file of tweets from search query 
+
+    Parameters:
+        hashtag (str): what would be typed into twitter -> explore -> search
+        date (str): 'YYYY-MM-DD' start date
+        max_tweets (int): max amount of tweets scraped
+
+    Returns: 
+        txt file of raw tweets
+    '''
+    consumer_key = secrets.API_Key
+    consumer_secret_key = secrets.API_Secret_Key
+    access_token = secrets.Access_Token
+    access_token_secret = secrets.Access_Token_Secret
+
+    auth = tw.OAuthHandler(consumer_key, consumer_secret_key)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tw.API(auth, wait_on_rate_limit=True)
+
+    search_words = str(hashtag)
+    date_since = date
+    retweet_filter = '-filter:retweets'
+    tweets_per_query = 100 
+    fName = 'raw_tweets.txt'
+    max_tweets = max_tweets
+    id = -1
+    tweetCount = 0
+
+    print('Downloading maximum of {0} tweets'.format(max_tweets))
+
+    with open(fName, 'w') as f: 
+        while tweetCount < max_tweets: 
+            tweets = []
+            try: 
+                if (id <= 0):  
+                        new_tweets = api.search( q = search_words+retweet_filter, count = tweets_per_query, lang = 'en', since=date_since, tweet_mode = 'extended')
+                        tweets.append(new_tweets)
+                else: 
+                    continue
+
+                if not new_tweets: 
+                    print("Cannot get tweets")
+                    break
+                for tweet in new_tweets: 
+                    f.write(str(tweet.full_text.replace('\n', '').encode('utf-8')) + '\n')
+
+                tweetCount += len(new_tweets)
+                print('Finished downloading {0} tweets'.format(tweetCount))
+
+            except tw.TweepError as e:
+                print('error :' + str(e))
+                break
+
+    print('Downlaoded {0} tweets, saved to {1}'.format(tweetCount, fName))
+
+twitter_fetch('dogecoin', '2021-04-12', 200)

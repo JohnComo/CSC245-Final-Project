@@ -6,7 +6,7 @@ import secrets
 
 def yahoo_history_scraper(ticker, period, start, end): 
     '''
-    Creates a pandas dataframe for specified stock from start to end by specified period
+    Creates a pandas dataframe for specified stock from start to end by specified period and makes a csv 
 
     Parameters: 
         ticker (str) : stock ticker from yahoo
@@ -15,7 +15,7 @@ def yahoo_history_scraper(ticker, period, start, end):
         end (str) : 'YYYY-MM-DD'
     
     Returns: 
-        DataFrame with features Open High Low Close Volume Dividends Stock Splits
+        DataFrame and csv with features Open High Low Close Volume Dividends Stock Splits
     '''
     ticker_symbol = ticker 
 
@@ -23,11 +23,12 @@ def yahoo_history_scraper(ticker, period, start, end):
 
     tickerDf = tickerData.history(period = period, start = start, end = end)
 
+    tickerDf.to_csv('finance.csv')
     return tickerDf
 
 
-#doge = yahoo_history_scraper('DOGE-USD', '1d', '2020-10-01', '2021-04-10')
-#print(doge.tail())
+doge = yahoo_history_scraper('DOGE-USD', '1d', '2020-10-01', '2021-04-10')
+
 
 def twitter_fetch(hashtag, date, max_tweets): 
     '''

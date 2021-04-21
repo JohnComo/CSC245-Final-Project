@@ -124,7 +124,7 @@ def persons_tweets(screen_name, oldest):
     
     #keep grabbing tweets until there are no tweets left to grab
     while len(new_tweets) > 0:
-        print(f"getting tweets before {oldest}")
+        print(f"getting tweets starting at {oldest}")
         
         new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
 
@@ -137,9 +137,8 @@ def persons_tweets(screen_name, oldest):
     
     #write the csv  
     with open(f'new_{screen_name}_tweets.txt', 'w') as f:
-        writer = f.write(str(outtweets))
-        writer.writerow(["id","created_at","text"])
-        writer.writerows(outtweets)
+        f.write(str(outtweets))
+
     
     pass
 

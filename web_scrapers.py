@@ -30,7 +30,7 @@ def yahoo_history_scraper(ticker, period, start, end):
     return tickerDf
 
 
-#doge = yahoo_history_scraper('DOGE-USD', '1d', '2020-10-01', '2021-04-10')
+doge = yahoo_history_scraper('DOGE-USD', '1d', '2020-10-01', '2021-04-10')
 
 # Going to make a class eventually for this with auth method 
 
@@ -92,7 +92,7 @@ def twitter_fetch(hashtag, date, max_tweets):
 
     print('Downlaoded {0} tweets, saved to {1}'.format(tweetCount, fName))
 
-#twitter_fetch('dogecoin', '2021-04-12', 200)
+twitter_fetch('dogecoin', '2021-04-12', 200)
 
 def persons_tweets(screen_name, oldest): 
     '''
@@ -115,31 +115,24 @@ def persons_tweets(screen_name, oldest):
 
     alltweets = []
     
-    #make initial request for most recent tweets (200 is the maximum allowed count)
     new_tweets = api.user_timeline(screen_name = screen_name,count=200)
     
     #save most recent tweets
     alltweets.extend(new_tweets)
-    
-    #save the id of the oldest tweet less one
+  
     oldest = str(oldest)
     
     #keep grabbing tweets until there are no tweets left to grab
     while len(new_tweets) > 0:
         print(f"getting tweets before {oldest}")
         
-        #all subsiquent requests use the max_id param to prevent duplicates
         new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
-        
-        #save most recent tweets
+
         alltweets.extend(new_tweets)
-        
-        #update the id of the oldest tweet less one
-        #oldest = alltweets[-1].id - 1
         
         print(f"...{len(alltweets)} tweets downloaded so far")
     
-    #transform the tweepy tweets into a 2D array that will populate the csv 
+    #transform the tweepy tweets into a 2D array that will populate the txt 
     outtweets = [[tweet.id_str, tweet.created_at, tweet.text] for tweet in alltweets]
     
     #write the csv  
@@ -150,13 +143,5 @@ def persons_tweets(screen_name, oldest):
     
     pass
 
-    #fName = 'user_tweets.txt'
-    #tweetCount = 0 
-
-    #with open(fName, 'w') as f:
-     #   while tweetCount < tweet_max: 
-      #      print ('Beginning to get {0} tweets from {1}'.format(tweet_max, username))
-       #     for i,tweet in enumerate(tw.Cursor(api.home_timeline)).items(100): 
-        #         f.write(str(i,tweet.text))
 
 persons_tweets('elonmusk', '2021-03-31')
